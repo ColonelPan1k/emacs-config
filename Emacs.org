@@ -359,6 +359,11 @@ electric-pair-mode added an extra ' where it shouldn't be
 		   `(lambda (c)
 		      (if (char-equal c ?') t (,electric-pair-inhibit-predicate c))))))
 #+end_src
+** YAML
+#+begin_src emacs-lisp
+  (require 'yaml-mode)
+  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+#+end_src
 * Org-Mode
 ** General Settings
 Startup org, set some important default locations, and add source block
