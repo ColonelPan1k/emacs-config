@@ -1,0 +1,601 @@
+* Credits
+A lot of the inspiration for this has been taken from [[https://github.com/hrs/dotfiles/tree/main/emacs][here]] and [[https://github.com/daviwil/emacs-from-scratch][here]].
+* Startup
+** Use-package
+#+BEGIN_SRC emacs-lisp
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+#+END_SRC
+** Kill Message Buffer
+#+BEGIN_SRC emacs-lisp
+  (setq-default message-log-max nil)
+  (kill-buffer "*Messages*")
+#+END_SRC
+** All the Icons
+#+BEGIN_SRC emacs-lisp
+  (use-package all-the-icons)
+  (setq inhibit-compacting-font-cache t)
+#+END_SRC
+* Package Management
+#+BEGIN_SRC emacs-lisp
+  ;; Initialize package sources
+  (require 'package)
+
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+			   ("org" . "https://orgmode.org/elpa/")
+			   ("elpa" . "https://elpa.gnu.org/packages/")))
+  (unless package-archive-contents
+    (package-refresh-contents))
+
+    ;; Initialize use-package on non-Linux platforms
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+#+END_SRC
+** Load Customs File
+This sets a specific file to load
+
+#+BEGIN_SRC emacs-lisp
+  (setq custom-file (concat user-emacs-directory "lisp/custom.el"))
+#+END_SRC
+* Load-Path
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/init.el")
+  (add-to-list 'load-path "~/.emacs.d/org-bullets")
+  (add-to-list 'load-path "~/.emacs.d/lisp")
+  (load-file custom-file)
+#+END_SRC
+** Startup Performance
+Make startup faster by reducing the frequency of garbage collection and use a
+hook to measure startup time
+
+#+BEGIN_SRC emacs-lisp
+;; The default is 800 kilobytes.  Measured in bytes.
+(setq gc-cons-threshold (* 50 1000 1000))
+
+;; Profile emacs startup
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "*** Emacs loaded in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
+#+END_SRC
+
+** Configure use-package
+#+BEGIN_SRC emacs-lisp
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
+
+; Always compile the newest version of packages
+(use-package auto-compile
+  :config (auto-compile-on-load-mode))
+
+(setq load-prefer-newer t)
+
+; Disable deprication warnings about cl functions
+(setq byte-compile-warnings '(cl-functions))
+
+; Auto-update packages
+(use-package auto-package-update
+  :ensure t
+  :config
+  (setq auto-package-update-delete-old-versions t))
+#+END_SRC
+
+** Load Sensible Defaults
+#+BEGIN_SRC emacs-lisp
+(load-file "~/.emacs.d/lisp/sensible-defaults.el")
+(sensible-defaults/use-all-settings)
+(sensible-defaults/use-all-keybindings)
+(sensible-defaults/backup-to-temp-directory)
+#+END_SRC
+
+* General Configuration
+** User Information
+#+BEGIN_SRC emacs-lisp
+  (setq user-full-name "Kyle Goldbeck"
+        user-mail-address "kyle.goldbeck@gmail.com"
+        calendar-latitude 42.361145
+        calendar-longitude -71.057083
+        calendar-location-name "Boston, MA")
+
+#+END_SRC
+** Case-insensitive Auto-Complete
+I can't stand case-sensitive completion, get rid of it.
+#+BEGIN_SRC emacs-lisp
+  (setq completion-ignore-case t)
+  (setq read-buffer-completion-ignore-case t)
+  (setq read-file-name-completion-ignore-case t)
+#+END_SRC
+** Backups
+The Emacs =.#= files are annoying, messy, and get in the way
+of things.  I want them gone.
+
+#+BEGIN_SRC emacs-lisp
+  (setq make-backup-files nil)
+  (setq create-lockfiles nil)
+#+END_SRC
+** Set Default Browser
+When I open a link in emacs, I'd like it to use eww rather than
+firefox.
+#+BEGIN_SRC emacs-lisp
+  (setq browse-url-browser-function 'eww-browse-url)
+#+END_SRC
+* User Interface
+** General UI Config
+Clean up the UI and make it look more minimal
+
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-message t
+	initial-buffer-choice nil)  ; Disable the startup message
+
+
+  (scroll-bar-mode -1)              ; Disable the scroll bar
+  (tool-bar-mode -1)                ; Disable the toolbar
+  (tooltip-mode -1)                 ; Disable tooltips
+  (set-fringe-mode 10)              ; Give some breathing room
+
+  (menu-bar-mode -1)                ; Disable the menu bar
+
+  (setq ring-bell-function 'ignore) ; Disable the windows bell
+  (setq visible-bell t)             ; Enable the visible bell
+  (setq global-hl-line-mode t)      ; Enable global line highlighting
+#+END_SRC
+
+Improve scrolling
+
+#+BEGIN_SRC emacs-lisp
+(setq mouse-wheel-scroll-amount '(2 ((shift) . 2)))
+(setq mouse-wheel-progressive-speed nil)
+(setq mouse-wheel-follow-mouse 't) ; Scroll the window under the mouse
+(setq scroll-step 2)
+(setq use-dialog-box nil)
+#+END_SRC
+
+Enable line Numbers
+
+#+BEGIN_SRC emacs-lisp
+  (global-display-line-numbers-mode) ;; Global line numbers
+  (add-hook 'prog-mode-hook 'electric-pair-mode)
+  (remove-hook 'org-mode 'electric-pair-mode)
+#+END_SRC
+
+Hide startup splash screen
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-screen t
+        inhibit-scratch-message t)
+#+END_SRC
+** Tabs and Formatting
+#+BEGIN_SRC emacs-lisp
+  (setq tab-width 4)
+  (defvaralias 'c-basic-offset 'tab-width)
+#+END_SRC
+** Theme
+
+[[https://emacsthemes.com/][A nice gallery of Emacs themes if you're bored or want something new]]
+
+Load my custom themes directory
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+#+END_SRC
+
+And load the current theme that I'm using. Suscolors and Seventies are also two
+other themes I've used extensively in the past.
+
+#+BEGIN_SRC emacs-lisp
+  (load-theme 'cyberpunk)
+#+END_SRC
+
+Cyberpunk theme has an odd issue with line highlighting and source blocks, though
+it seems like it's only affecting this file.
+** Font
+*** Set the font
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'default-frame-alist '(font . "Rec Mono Linear:pixelsize=20:foundry=ARRW:weight=normal:slant=normal:width=normal:spacing=100:scalable=true"))
+  (set-face-attribute :height 140)
+  (setq-default fill-column 80)
+#+END_SRC
+*** Enable proper Unicode glyph support
+#+BEGIN_SRC emacs-lisp
+  (defun dw/replace-unicode-font-mapping (block-name old-font new-font)
+    (let* ((block-idx (cl-position-if
+                           (lambda (i) (string-equal (car i) block-name))
+                           unicode-fonts-block-font-mapping))
+           (block-fonts (cadr (nth block-idx unicode-fonts-block-font-mapping)))
+           (updated-block (cl-substitute new-font old-font block-fonts :test 'string-equal)))
+      (setf (cdr (nth block-idx unicode-fonts-block-font-mapping))
+            `(,updated-block))))
+
+  (use-package unicode-fonts
+    :disabled
+    :if (not dw/is-termux)
+    :custom
+    (unicode-fonts-skip-font-groups '(low-quality-glyphs))
+    :config
+    ;; Fix the font mappings to use the right emoji font
+    (mapcar
+      (lambda (block-name)
+        (dw/replace-unicode-font-mapping block-name "Apple Color Emoji" "Noto Color Emoji"))
+      '("Dingbats"
+        "Emoticons"
+        "Miscellaneous Symbols and Pictographs"
+        "Transport and Map Symbols"))
+    (unicode-fonts-setup))
+#+END_SRC
+** Rainbow Delimiters
+#+BEGIN_SRC emacs-lisp
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+#+END_SRC
+** Smart-parens
+#+BEGIN_SRC emacs-lisp
+  (use-package smartparens
+    :hook (prog-mode . smartparens-mode))
+#+END_SRC
+
+** Dashboard
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard-hackernews
+    :config
+    (require 'json))
+#+END_SRC
+
+Ensure Dashboard loads and is displayed when Emacs starts
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+    :ensure t
+    :after dashboard-hackernews
+    :config
+    (dashboard-setup-startup-hook))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (setq dashboard-startup-banner "~/.emacs.d/img/magi.png")
+  (setq dashboard-center-content t)
+
+  (setq dashboard-items '((recents . 7)
+			  (projects . 7)
+			  (agenda . 7)
+			  (hackernews . 7)))
+  (setq dashboard-item-shortcuts '((recents . "r")
+				   (bookmarks . "m")
+				   (projects . "p")
+				   (agenda . "a")
+				   (registers . "e")
+				   (hackernews . "k")))
+
+  (setq dashboard-week-agenda t)
+
+  (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
+
+  (setq dashboard-banner-logo-title "")
+
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+#+END_SRC
+** Powerline
+#+BEGIN_SRC emacs-lisp
+(require 'powerline)
+(powerline-default-theme)
+#+END_SRC
+* Default Coding System
+#+BEGIN_SRC emacs-lisp
+  (setq locale-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (prefer-coding-system 'utf-8)
+#+END_SRC
+* Mode Line
+** General Config
+#+BEGIN_SRC emacs-lisp
+(setq display-time-format "%l:%M %p %b %y"
+      display-time-default-load-average nil)
+
+(use-package diminish)
+#+END_SRC
+
+* Key Bindings
+** ESC Cancels All
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+END_SRC
+** Open Config File
+I edit my config file a lot.  It's nice to have a quick way to access it.
+#+BEGIN_SRC emacs-lisp
+  (defun config-visit ()
+    (interactive)
+    (find-file "~/.emacs.d/Emacs.org"))
+  (global-set-key (kbd "C-c e") 'config-visit)
+#+END_SRC
+** Open Work Descriptions File
+This file keeps track of what I've done at work each day
+
+#+BEGIN_SRC emacs-lisp
+  (defun open-daily-desc ()
+    (interactive)
+    (find-file "~/Org-Files/Work/Daily-Descriptions.org"))
+
+  (global-set-key (kbd "C-c d") 'open-daily-desc)
+#+END_SRC
+** Open Org-Todo File
+I know there's already a keybinding ='C-c a t'= for opening the org-todo menu,
+but I have a lot of nested tasks within my daily TODOs so it's nice to have a
+way to open the file quickly
+
+#+BEGIN_SRC emacs-lisp
+  (defun open-todo ()
+    (interactive)
+    (find-file "~/Org-Files/todo.org"))
+
+  (global-set-key (kbd "C-c t") 'open-todo)
+#+END_SRC
+* Programming Language Config
+** Python
+*** Blacken-mode
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'python-mode-hook 'blacken-mode)
+#+END_SRC
+** Emacs-lisp
+#+begin_src emacs-lisp
+    (add-hook
+     'emacs-lisp-mode-hook
+     (lambda ()
+       (setq-local electric-pair-inhibit-predicate
+		   `(lambda (c)
+		      (if (char-equal c ?') t (,electric-pair-inhibit-predicate c))))))
+#+end_src
+* Org-Mode
+** General Settings
+Use-package org
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :defer t)
+  (setq org-directory "~/Org-Files")
+
+  (defconst org-archive-file "~/Org-Files/Archive/archive-2021.org")
+  (defconst org-todo-file "~/Org-Files/todo/todo.org")
+
+  (setq org-agenda-files (list org-todo-file))
+
+  (with-eval-after-load 'org
+    (require 'org-tempo)
+    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+    (add-to-list 'org-structure-template-alist '("py" . "src python")))
+#+END_SRC
+
+Disable electric-pair-mode for '<' in org-mode.  This is useful for source blocks.
+
+#+begin_src emacs-lisp
+  (add-hook
+   'org-mode-hook
+   (lambda ()
+     (setq-local electric-pair-inhibit-predicate
+		 `(lambda (c)
+		    (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
+#+end_src
+
+** Org-Bullets
+#+BEGIN_SRC emacs-lisp
+  (require 'org-bullets)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+END_SRC
+** Key Bindings
+#+BEGIN_SRC emacs-lisp
+  (define-key global-map "\C-cl" 'org-store-link)
+  (define-key global-map "\C-ca" 'org-agenda)
+#+END_SRC
+** Todo
+#+BEGIN_SRC emacs-lisp
+  (defun org-file-path (filename)
+    "Return the absolute address of an org file, given its relative name."
+    (concat (file-name-as-directory org-directory) filename))
+#+END_SRC
+
+Set org-todo-keywods, add any custom keywords here
+#+BEGIN_SRC emacs-lisp
+  (setq org-todo-keywords
+        '((sequence "TODO" "IN-PROGRESS" "WAITING" "DONE")))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  ; Record the time that a todo was archived
+  (setq org-log-done 'time)
+
+  ; Start weeks today
+  (setq org-agenda-start-on-weekday nil)
+
+  ; Show the next two weeks
+  (setq org-agenda-span 14)
+#+END_SRC
+** Org LaTeX Settings
+#+BEGIN_SRC emacs-lisp
+  (setq org-latex-default-package-alist '("" "minted"))
+
+  ;; Native tab in source blocks
+  (setq org-src-tab-acts-natively t)
+
+  ;; Use syntax highlighting in source blocks
+  (setq org-src-fontify-natively t)
+
+  ;; Hide emphasis markers like // or **
+  (setq org-hide-emphasis-markers t)
+
+  ;; Use the current window when editing a code snippet
+  (setq org-src-window-setup 'current-window)
+
+  ;; Don't indent newly expanded blocks
+  (setq org-adapt-indentation nil)
+
+  ;; Line wrapping
+  (add-hook 'org-mode-hook
+            '(lambda()
+               (visual-line-mode 1)))
+#+END_SRC
+** Archiving
+#+BEGIN_SRC emacs-lisp
+  ; Taken from github.com/hrs/dotfiles
+
+  (setq org-archive-location
+	(concat
+	 (org-file-path (format "archive/archive-%s.org" (format-time-string "%Y")))
+	 "::* From %s"))
+
+  (defun save-archive-file ()
+    (interactive)
+    (save-some-buffers 'no-confirm (lambda ()
+				   (cond (equal buffer-file-name (expand-file-name org-archive-location))
+					 (equal buffer-file-name (expand-file-name org-todo-file))))))
+
+  (defun hrs/mark-done-and-archive ()
+    "Mark the state of an org-mode item as DONE and archive it."
+    (interactive)
+    (org-todo 'done)
+    (org-archive-subtree)
+    (save-archive-file))
+
+  (define-key org-mode-map (kbd "C-c C-x C-s") 'hrs/mark-done-and-archive)
+#+END_SRC
+** Org-Superstar
+
+Set custom bullets for org-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package org-superstar
+    :after org
+    :hook (org-mode . org-superstar-mode)
+    :custom
+    (org-superstar-remove-leading-stars t)
+    (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "●" "○" "●")))
+#+END_SRC
+
+** Org-Export-Backends
+#+BEGIN_SRC emacs-lisp
+  (setq org-export-backends '(ascii html latex md))
+#+END_SRC
+* Org-Roam
+Org-Roam and the Zettelkasten method seems like an extremely useful tool to have when
+reading/learning about anything.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-roam
+    :ensure t
+    :init
+    (setq org-roam-v2-ack t)
+    :custom
+    (org-roam-directory (file-truename "~/Org-Files/roam"))
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+	   ("C-c n f" . org-roam-node-find)
+	   ("C-c n i" . org-roam-node-insert)
+	   ("C-c n g" . org-roam-graph)
+	   ("C-c n c" . org-roam-capture)
+	   ("C-c n j" . org-roam-dailies-capture-today))
+    :config
+    (org-roam-setup))
+#+END_SRC
+
+
+# Configure the buffers to display properly
+# #+begin_src emacs-lisp
+#   ;; for org-roam-buffer-toggle
+#   ;; Recommendation in the official manual
+#   (add-to-list 'display-buffer-alist
+# 		 '("\\*org-roam\\*"
+# 		    (display-buffer-in-direction)
+# 		    (direction . down)
+# 		    (window-width . 0.33)
+# 		    (window-height . fit-window-to-buffer)))
+# #+end_src
+
+* Org-Babel
+** Source Blocks
+#+BEGIN_SRC emacs-lisp
+  (setq org-confirm-babel-evaluate nil)
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (shell . t)
+     (python . t)
+     (C . t)
+     (haskell . t)))
+#+END_SRC
+* Flycheck
+Enable Flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :defer t
+    :hook (lsp-mode . flycheck-mode))
+#+END_SRC
+* Centaur Tabs
+TODO: Group centaur tabs by file type, not directory
+      e.g. all .py files should be grouped together
+      regardless of where they are
+#+BEGIN_SRC emacs-lisp
+  (use-package centaur-tabs
+    :demand
+    :config
+    (centaur-tabs-mode t)
+    :bind
+    ("C-<" . centaur-tabs-backward)
+    ("C->" . centaur-tabs-forward))
+
+  (centaur-tabs-headline-match)
+  (setq centaur-tabs-style "box")
+
+  (setq centaur-tabs-height 36)
+
+  (setq centaur-tabs-set-icons t)
+
+  (setq centaur-tabs-gray-out-icons 'buffer)
+
+  (setq centaur-tabs-set-bar 'left)
+
+  (setq centaur-tabs-close-button "X")
+
+  (setq centaur-tabs-set-modified-marker t)
+  (setq centaur-tabs-modified-marker "◉")
+
+  (setq centaur-tabs-label-fixed-length 8)
+
+#+END_SRC
+
+* Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :bind ("C-M-;" . magit-status)
+    :commands (magit-status- magit-get-current-branch)
+    :custom
+    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+#+end_src
+TODO: Move over zsh git aliases into magit
+* Helm
+#+begin_src emacs-lisp
+  (use-package helm
+    :config
+    (require 'helm-config)
+    :init
+    (helm-mode 1)
+    :bind
+    (("M-x" . helm-M-x)
+     ("C-x C-f" . helm-find-files)
+    :map helm-map
+    ("<tab>" . helm-execute-persistent-action)))
+
+#+end_src
+* Misc
+** Hackernews
+#+BEGIN_SRC emacs-lisp
+  (autoload 'hackernews "hackernews" nil t)
+#+END_SRC
+** Alerts
+=alert-toast= is a great library for windows notifications.
+I've got a few projects planned that involve notifications,
+so it's nice to have this around.
+
+#+BEGIN_SRC emacs-lisp
+  (require 'alert-toast)
+#+END_SRC
