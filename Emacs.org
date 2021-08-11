@@ -1,5 +1,3 @@
-* Credits
-A lot of the inspiration for this has been taken from [[https://github.com/hrs/dotfiles/tree/main/emacs][here]] and [[https://github.com/daviwil/emacs-from-scratch][here]].
 * Startup
 ** Use-package
 #+BEGIN_SRC emacs-lisp
@@ -87,6 +85,9 @@ hook to measure startup time
 #+END_SRC
 
 ** Load Sensible Defaults
+
+This is a greatdefault file from [[https://github.com/hrs][HRS]].  This has some seriously nice QOL improvements
+that you might not think to add yourself.
 #+BEGIN_SRC emacs-lisp
 (load-file "~/.emacs.d/lisp/sensible-defaults.el")
 (sensible-defaults/use-all-settings)
@@ -105,15 +106,18 @@ hook to measure startup time
 
 #+END_SRC
 ** Case-insensitive Auto-Complete
-I can't stand case-sensitive completion, get rid of it.
+There is really no good reason to use case-sensitive autocomplete.  If you're using Helm it
+doesn't really matter, but I want to make sure it's really off.
 #+BEGIN_SRC emacs-lisp
   (setq completion-ignore-case t)
   (setq read-buffer-completion-ignore-case t)
   (setq read-file-name-completion-ignore-case t)
 #+END_SRC
-** Backups
-The Emacs =.#= files are annoying, messy, and get in the way
-of things.  I want them gone.
+** Backups and Lock Files
+The Emacs default lock files seem to make a huge mess and have also
+broken some applications that track file changes.  Maybe it's not smart
+to turn off backups, but I save like crazy so I don't think it's really
+an issue.
 
 #+BEGIN_SRC emacs-lisp
   (setq make-backup-files nil)
@@ -121,29 +125,30 @@ of things.  I want them gone.
 #+END_SRC
 ** Set Default Browser
 When I open a link in emacs, I'd like it to use eww rather than
-firefox.
+firefox.  This is mostly for hackernews.
 #+BEGIN_SRC emacs-lisp
   (setq browse-url-browser-function 'eww-browse-url)
 #+END_SRC
 * User Interface
 ** General UI Config
-Clean up the UI and make it look more minimal
+Clean up the UI and make it look more minimal.  These are some of the first options
+anyone will set when configuring emacs.
 
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-startup-message t
-	initial-buffer-choice nil)  ; Disable the startup message
+	initial-buffer-choice nil)
 
 
-  (scroll-bar-mode -1)              ; Disable the scroll bar
-  (tool-bar-mode -1)                ; Disable the toolbar
-  (tooltip-mode -1)                 ; Disable tooltips
-  (set-fringe-mode 10)              ; Give some breathing room
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (tooltip-mode -1)
+  (set-fringe-mode 10)
 
-  (menu-bar-mode -1)                ; Disable the menu bar
+  (menu-bar-mode -1)
 
-  (setq ring-bell-function 'ignore) ; Disable the windows bell
-  (setq visible-bell t)             ; Enable the visible bell
-  (setq global-hl-line-mode t)      ; Enable global line highlighting
+  (setq ring-bell-function 'ignore)
+  (setq visible-bell t)
+  (setq global-hl-line-mode t)
 #+END_SRC
 
 Improve scrolling
@@ -183,15 +188,12 @@ Load my custom themes directory
   (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 #+END_SRC
 
-And load the current theme that I'm using. Suscolors and Seventies are also two
-other themes I've used extensively in the past.
+Load the current theme that I'm using. Suscolors and Seventies are also two
+other themes I've used extensively in the past but Cyberpunk just looks the coolest.
 
 #+BEGIN_SRC emacs-lisp
   (load-theme 'cyberpunk)
 #+END_SRC
-
-Cyberpunk theme has an odd issue with line highlighting and source blocks, though
-it seems like it's only affecting this file.
 ** Font
 *** Set the font
 #+BEGIN_SRC emacs-lisp
@@ -238,6 +240,9 @@ it seems like it's only affecting this file.
 #+END_SRC
 
 ** Dashboard
+Dashboard is probably my favorite emacs package.  It's great to give emacs a
+proper, configurable splash screen with information you actually want to see.
+
 #+BEGIN_SRC emacs-lisp
   (use-package dashboard-hackernews
     :config
@@ -301,6 +306,7 @@ Ensure Dashboard loads and is displayed when Emacs starts
 
 * Key Bindings
 ** ESC Cancels All
+I don't use this very much, but it's nice to include anyways.
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+END_SRC
@@ -309,11 +315,12 @@ I edit my config file a lot.  It's nice to have a quick way to access it.
 #+BEGIN_SRC emacs-lisp
   (defun config-visit ()
     (interactive)
-    (find-file "~/.emacs.d/Emacs.org"))
+    (find-file "~/dev/Emacs_config/Emacs.org"))
   (global-set-key (kbd "C-c e") 'config-visit)
 #+END_SRC
 ** Open Work Descriptions File
-This file keeps track of what I've done at work each day
+This file keeps track of what I've done at work each day and helps with
+general work-related logging
 
 #+BEGIN_SRC emacs-lisp
   (defun open-daily-desc ()
@@ -323,9 +330,9 @@ This file keeps track of what I've done at work each day
   (global-set-key (kbd "C-c d") 'open-daily-desc)
 #+END_SRC
 ** Open Org-Todo File
-I know there's already a keybinding ='C-c a t'= for opening the org-todo menu,
+I know there's already a keybinding `C-c a t'` for opening the org-todo menu,
 but I have a lot of nested tasks within my daily TODOs so it's nice to have a
-way to open the file quickly
+way to open the file quickly and save a few keystrokes
 
 #+BEGIN_SRC emacs-lisp
   (defun open-todo ()
@@ -337,10 +344,13 @@ way to open the file quickly
 * Programming Language Config
 ** Python
 *** Blacken-mode
+Blacken linting is great and auto-formats python files on save.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'python-mode-hook 'blacken-mode)
 #+END_SRC
 ** Emacs-lisp
+I've spent way too long debugging my config file just to realize that
+electric-pair-mode added an extra ' where it shouldn't be
 #+begin_src emacs-lisp
     (add-hook
      'emacs-lisp-mode-hook
@@ -351,24 +361,26 @@ way to open the file quickly
 #+end_src
 * Org-Mode
 ** General Settings
-Use-package org
+Startup org, set some important default locations, and add source block
+hotkeys
 #+BEGIN_SRC emacs-lisp
-  (use-package org
-    :defer t)
-  (setq org-directory "~/Org-Files")
+    (use-package org
+      :defer t)
+    (setq org-directory "~/Org-Files")
 
-  (defconst org-archive-file "~/Org-Files/Archive/archive-2021.org")
-  (defconst org-todo-file "~/Org-Files/todo/todo.org")
+    (defconst org-archive-file "~/Org-Files/Archive/archive-2021.org")
+    (defconst org-todo-file "~/Org-Files/todo/todo.org")
 
-  (setq org-agenda-files (list org-todo-file))
+    (setq org-agenda-files (list org-todo-file))
 
-  (with-eval-after-load 'org
-    (require 'org-tempo)
-    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-    (add-to-list 'org-structure-template-alist '("py" . "src python")))
+    (with-eval-after-load 'org
+      (require 'org-tempo)
+      (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+      (add-to-list 'org-structure-template-alist '("py" . "src python"))
+      (add-to-list 'org-structure-template-alist '("js" . "src javascript")))
 #+END_SRC
 
-Disable electric-pair-mode for '<' in org-mode.  This is useful for source blocks.
+Disable electric-pair-mode for '<' in org-mode.  This fixes source blocks.
 
 #+begin_src emacs-lisp
   (add-hook
@@ -413,6 +425,8 @@ Set org-todo-keywods, add any custom keywords here
   (setq org-agenda-span 14)
 #+END_SRC
 ** Org LaTeX Settings
+I don't work much in LaTeX anymore.  This is mostly a carryover from when I wrote
+a lot of LaTeX.
 #+BEGIN_SRC emacs-lisp
   (setq org-latex-default-package-alist '("" "minted"))
 
@@ -437,9 +451,9 @@ Set org-todo-keywods, add any custom keywords here
                (visual-line-mode 1)))
 #+END_SRC
 ** Archiving
+I love being able to archive TODOs.  The extra detail is also a nice touch.
 #+BEGIN_SRC emacs-lisp
   ; Taken from github.com/hrs/dotfiles
-
   (setq org-archive-location
 	(concat
 	 (org-file-path (format "archive/archive-%s.org" (format-time-string "%Y")))
@@ -473,12 +487,13 @@ Set custom bullets for org-mode
 #+END_SRC
 
 ** Org-Export-Backends
+Enable markdown exporting and remove some of the other export formats I'll never use
 #+BEGIN_SRC emacs-lisp
-  (setq org-export-backends '(ascii html latex md))
+  (setq org-export-backends '(html latex md))
 #+END_SRC
 * Org-Roam
 Org-Roam and the Zettelkasten method seems like an extremely useful tool to have when
-reading/learning about anything.
+reading/learning about anything.  I'm already hooked on org-roam.
 
 #+BEGIN_SRC emacs-lisp
   (use-package org-roam
@@ -497,19 +512,6 @@ reading/learning about anything.
     (org-roam-setup))
 #+END_SRC
 
-
-# Configure the buffers to display properly
-# #+begin_src emacs-lisp
-#   ;; for org-roam-buffer-toggle
-#   ;; Recommendation in the official manual
-#   (add-to-list 'display-buffer-alist
-# 		 '("\\*org-roam\\*"
-# 		    (display-buffer-in-direction)
-# 		    (direction . down)
-# 		    (window-width . 0.33)
-# 		    (window-height . fit-window-to-buffer)))
-# #+end_src
-
 * Org-Babel
 ** Source Blocks
 #+BEGIN_SRC emacs-lisp
@@ -524,16 +526,14 @@ reading/learning about anything.
      (haskell . t)))
 #+END_SRC
 * Flycheck
-Enable Flycheck
+I should proabaly remove this since I can rarely get flycheck to work properly.
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :defer t
     :hook (lsp-mode . flycheck-mode))
 #+END_SRC
 * Centaur Tabs
-TODO: Group centaur tabs by file type, not directory
-      e.g. all .py files should be grouped together
-      regardless of where they are
+Centaur tabs are great to have and make navigating lots of open buffers much easier
 #+BEGIN_SRC emacs-lisp
   (use-package centaur-tabs
     :demand
@@ -571,7 +571,6 @@ TODO: Group centaur tabs by file type, not directory
     :custom
     (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 #+end_src
-TODO: Move over zsh git aliases into magit
 * Helm
 #+begin_src emacs-lisp
   (use-package helm
