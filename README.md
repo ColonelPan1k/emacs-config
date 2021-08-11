@@ -12,3 +12,5 @@ emacs and not need any outisde applications.
 
 Much of my config is inspired by the config files of [Harry R. Schwartz](https://github.com/hrs/dotfiles/blob/main/emacs/dot-emacs.d/configuration.org)
 and [David Wilson](https://github.com/daviwil/dotfiles/blob/master/Emacs.org)).
+
+![Emacs](https://raw.githubusercontent.com/kmg731/emacs-config/master/screenshots/Screenshot%20from%202021-08-10%2022-29-09_UPDATED.png)
