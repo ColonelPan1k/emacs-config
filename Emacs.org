@@ -509,9 +509,13 @@ reading/learning about anything.  I'm already hooked on org-roam.
 	   ("C-c n c" . org-roam-capture)
 	   ("C-c n j" . org-roam-dailies-capture-today))
     :config
-    (org-roam-setup))
+    (org-roam-setup)
+    (require 'org-roam-protocol))
 #+END_SRC
 
+#+begin_src emacs-lisp
+  (setq org-roam-graph-viewer #'eww-open-file)
+#+end_src
 * Org-Babel
 ** Source Blocks
 #+BEGIN_SRC emacs-lisp
