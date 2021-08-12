@@ -311,12 +311,13 @@ I don't use this very much, but it's nice to include anyways.
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+END_SRC
 ** Always kill current buffer
-#+begin_src emacs-lisp
-  (defun hrs/kill-current-buffer ()
-    "Kill the current buffer without prompting"
-    (kill-buffer (current-buffer)))
-  (global-set-key (kbd "C-x k") 'hrs/kill-current-buffer)
-#+end_src
+DEBUG
+# #+begin_src emacs-lisp
+#   (defun hrs/kill-current-buffer ()
+#     "Kill the current buffer without prompting"
+#     (kill-buffer (current-buffer)))
+#   (global-set-key (kbd "C-x k") 'hrs/kill-current-buffer)
+# #+end_src
 ** Faster change window
 Using "C-x o" can get annoying after awhile, "M-o" is much easier
 #+begin_src emacs-lisp
@@ -629,7 +630,8 @@ so it's nice to have this around.
 #+END_SRC
 
 ** Dif-hl-mode
-Highlights uncommitted changes in a git repo
-#+begin_src emacs-lisp
-  (global-diff-hl-mode)
-#+end_src
+DEBUG
+# Highlights uncommitted changes in a git repo
+# #+begin_src emacs-lisp
+#   (global-dif-hl-mode)
+# #+end_src
