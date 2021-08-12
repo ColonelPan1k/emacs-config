@@ -317,6 +317,11 @@ I don't use this very much, but it's nice to include anyways.
     (kill-buffer (current-buffer)))
   (global-set-key (kbd "C-x k") 'hrs/kill-current-buffer)
 #+end_src
+** Faster change window
+Using "C-x o" can get annoying after awhile, "M-o" is much easier
+#+begin_src emacs-lisp
+  (global-set-key (kbd "M-o") 'other-window)
+#+end_src
 ** Open Config File
 I edit my config file a lot.  It's nice to have a quick way to access it.
 #+BEGIN_SRC emacs-lisp
@@ -622,3 +627,9 @@ so it's nice to have this around.
 #+BEGIN_SRC emacs-lisp
   (require 'alert-toast)
 #+END_SRC
+
+** Dif-hl-mode
+Highlights uncommitted changes in a git repo
+#+begin_src emacs-lisp
+  (global-diff-hl-mode)
+#+end_src
