@@ -596,10 +596,7 @@ Centaur tabs are great to have and make navigating lots of open buffers much eas
 * Magit
 #+begin_src emacs-lisp
   (use-package magit
-    :bind ("C-M-;" . magit-status)
-    :commands (magit-status- magit-get-current-branch)
-    :custom
-    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+    :ensure t)
 #+end_src
 * Helm
 #+begin_src emacs-lisp
