@@ -614,9 +614,11 @@ Centaur tabs are great to have and make navigating lots of open buffers much eas
     :bind
     (("M-x" . helm-M-x)
      ("C-x C-f" . helm-find-files)
+     ("C-x b" . helm-buffers-list)
+     ("M-y" . helm-show-kill-ring)
+     ("C-s" . helm-occur)
     :map helm-map
     ("<tab>" . helm-execute-persistent-action)))
-
 #+end_src
 * Misc
 ** Hackernews
