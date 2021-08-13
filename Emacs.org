@@ -390,21 +390,33 @@ Make yaml-mode snap to indent level of a newline
 Startup org, set some important default locations, and add source block
 hotkeys
 #+BEGIN_SRC emacs-lisp
-    (use-package org
-      :defer t)
-    (setq org-directory "~/Org-Files")
+  (use-package org
+    :defer t)
+  (setq org-directory "~/Org-Files")
 
-    (defconst org-archive-file "~/Org-Files/Archive/archive-2021.org")
-    (defconst org-todo-file "~/Org-Files/todo/todo.org")
+  (defun org-file-path (filename)
+    (concat (file-name-as-directory org-directory) filename))
 
-    (setq org-agenda-files (list org-todo-file))
+  (defconst org-archive-file "~/Org-Files/Archive/archive-2021.org")
+  (defconst org-todo-file "~/Org-Files/todo/todo.org")
 
-    (with-eval-after-load 'org
-      (require 'org-tempo)
-      (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-      (add-to-list 'org-structure-template-alist '("py" . "src python"))
-      (add-to-list 'org-structure-template-alist '("js" . "src javascript")))
+  (setq org-agenda-files (list org-todo-file))
+
+  (setq org-archive-location
+	(concat
+	 (org-file-path (format "archive/archive-%s.org" (format-time-string "%Y")))
+	 "::* From %s"))
+
+
+  (with-eval-after-load 'org
+    (require 'org-tempo)
+    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+    (add-to-list 'org-structure-template-alist '("py" . "src python"))
+    (add-to-list 'org-structure-template-alist '("js" . "src javascript")))
 #+END_SRC
+
+
+
 
 Disable electric-pair-mode for '<' in org-mode.  This fixes source blocks.
 
@@ -478,25 +490,19 @@ a lot of LaTeX.
 #+END_SRC
 ** Archiving
 I love being able to archive TODOs.  The extra detail is also a nice touch.
+There may be an issue with this command throwing an error relating to org-preserve-local-variables.
+
+To fix this, see [[https://github.com/syl20bnr/spacemacs/issues/11801][this issue]]:
+> Running =cd ~/emacs.d/elpa/develop; find org*/*.elc -print0 | xargs -0 rm= should fix the problem
+
 #+BEGIN_SRC emacs-lisp
-  ; Taken from github.com/hrs/dotfiles
-  (setq org-archive-location
-	(concat
-	 (org-file-path (format "archive/archive-%s.org" (format-time-string "%Y")))
-	 "::* From %s"))
-
-  (defun save-archive-file ()
-    (interactive)
-    (save-some-buffers 'no-confirm (lambda ()
-				   (cond (equal buffer-file-name (expand-file-name org-archive-location))
-					 (equal buffer-file-name (expand-file-name org-todo-file))))))
-
   (defun hrs/mark-done-and-archive ()
-    "Mark the state of an org-mode item as DONE and archive it."
-    (interactive)
-    (org-todo 'done)
-    (org-archive-subtree)
-    (save-archive-file))
+      "Mark the state of an org-mode item as DONE, archive it, and
+  save the Org buffers."
+      (interactive)
+      (org-todo 'done)
+      (org-archive-subtree)
+      (org-save-all-org-buffers))
 
   (define-key org-mode-map (kbd "C-c C-x C-s") 'hrs/mark-done-and-archive)
 #+END_SRC
