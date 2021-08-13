@@ -355,12 +355,6 @@ way to open the file quickly and save a few keystrokes
   (global-set-key (kbd "C-c t") 'open-todo)
 #+END_SRC
 * Programming Language Config
-** Python
-*** Blacken-mode
-Blacken linting is great and auto-formats python files on save.
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'python-mode-hook 'blacken-mode)
-#+END_SRC
 ** Emacs-lisp
 I've spent way too long debugging my config file just to realize that
 electric-pair-mode added an extra ' where it shouldn't be
@@ -372,6 +366,24 @@ electric-pair-mode added an extra ' where it shouldn't be
 		   `(lambda (c)
 		      (if (char-equal c ?') t (,electric-pair-inhibit-predicate c))))))
 #+end_src
+** Haskell
+#+begin_src emacs-lisp
+  (use-package haskell-mode)
+
+  (setq haskell-process-type 'cabal-repl)
+  (setq haskell-process-log t)
+
+  (add-hook 'haskell-mode-hook 'haskell-indent-mode)
+  (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+  (add-hook 'haskell-mode-hook 'haskell-doc-mode)
+  (add-hook 'haskell-mode-hook 'hindent-mode)
+#+end_src
+** Python
+*** Blacken-mode
+Blacken linting is great and auto-formats python files on save.
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'python-mode-hook 'blacken-mode)
+#+END_SRC
 ** YAML
 #+begin_src emacs-lisp
   (require 'yaml-mode)
