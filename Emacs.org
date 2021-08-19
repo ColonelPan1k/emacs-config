@@ -129,6 +129,8 @@ firefox.  This is mostly for hackernews.
 #+BEGIN_SRC emacs-lisp
   (setq browse-url-browser-function 'eww-browse-url)
 #+END_SRC
+* Custom Functions
+** Electric-pair-inhibit
 * User Interface
 ** General UI Config
 Clean up the UI and make it look more minimal.  These are some of the first options
@@ -385,6 +387,7 @@ Blacken linting is great and auto-formats python files on save.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'python-mode-hook 'blacken-mode)
 #+END_SRC
+** Scheme
 ** YAML
 #+begin_src emacs-lisp
   (require 'yaml-mode)
@@ -425,23 +428,23 @@ hotkeys
     (require 'org-tempo)
     (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
     (add-to-list 'org-structure-template-alist '("py" . "src python"))
-    (add-to-list 'org-structure-template-alist '("js" . "src javascript")))
+    (add-to-list 'org-structure-template-alist '("js" . "src javascript"))
+    (add-to-list 'org-structure-template-alist '("sc" . "src scheme")))
 #+END_SRC
 
 Disable electric-pair-mode for '<' in org-mode.  This fixes source blocks.
-
 #+begin_src emacs-lisp
   (add-hook
    'org-mode-hook
    (lambda ()
      (setq-local electric-pair-inhibit-predicate
-		 `(lambda (c)
-		    (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
+		   `(lambda (c)
+		      (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
 #+end_src
 
 Open an org-mode file with all buffers collapsed
 #+begin_src emacs-lisp
-  (setq org-startup-folded 'fold)
+  (setq org-startup-folded t)
 #+end_src
 
 ** Org-Bullets
