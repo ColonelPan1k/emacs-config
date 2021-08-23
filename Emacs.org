@@ -127,7 +127,7 @@ an issue.
 When I open a link in emacs, I'd like it to use eww rather than
 firefox.  This is mostly for hackernews.
 #+BEGIN_SRC emacs-lisp
-  (setq browse-url-browser-function 'eww-browse-url)
+  (setq browse-url-browser-function 'browse-url-w3)
 #+END_SRC
 * Custom Functions
 ** Electric-pair-inhibit
@@ -356,6 +356,10 @@ way to open the file quickly and save a few keystrokes
 
   (global-set-key (kbd "C-c t") 'open-todo)
 #+END_SRC
+** Open link in firefox
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-c C-f") 'browse-url-firefox)
+#+end_src
 * Programming Language Config
 ** Emacs-lisp
 I've spent way too long debugging my config file just to realize that
@@ -640,9 +644,24 @@ Centaur tabs are great to have and make navigating lots of open buffers much eas
 #+end_src
 * Misc
 ** Hackernews
+I think it's cool to be able to read hackernews articles in emacs
 #+BEGIN_SRC emacs-lisp
   (autoload 'hackernews "hackernews" nil t)
 #+END_SRC
+
+Save a hackernews URL and append it to a file for saved posts
+#+begin_src emacs-lisp
+  (defun hackernews-save-link (url)
+      (interactive (list (shr-url-at-point current-prefix-arg)))
+    (if (not url)
+	(message "No URL under point")
+      (setq url (url-encode-url url))
+      (setq title (thing-at-point 'line))
+      (write-region (format "[[%s][%s]]" url title) nil "~/Org-Files/Misc/Hackernews-Saved.org" 'append)))
+
+  (add-hook 'hackernews-mode-hook
+	    (lambda () (local-set-key (kbd "C-c C-s") #'hackernews-save-link)))
+#+end_src
 ** Alerts
 =alert-toast= is a great library for windows notifications.
 I've got a few projects planned that involve notifications,
@@ -652,9 +671,18 @@ so it's nice to have this around.
   (require 'alert-toast)
 #+END_SRC
 
-** Dif-hl-mode
-DEBUG
-# Highlights uncommitted changes in a git repo
-# #+begin_src emacs-lisp
-#   (global-dif-hl-mode)
-# #+end_src
+** w3m
+#+begin_src emacs-lisp
+  (setq browse-url-browser-function 'w3m-browse-url)
+  (autoload 'w3m-browse-url "w3m" "Ask a www browser to show a url" t)
+  (global-set-key "\C-xm" 'browse-url-at-point)
+#+end_src
+
+Change the margins.  I mostly use w3m to read articles
+#+begin_src emacs-lisp
+  (defun set-margins()
+    (setq left-margin-width 200)
+    (setq right-margin-width 200))
+
+  (add-hook 'w3m-mode-hook 'set-margins)
+#+end_src
