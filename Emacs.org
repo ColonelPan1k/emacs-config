@@ -123,12 +123,6 @@ an issue.
   (setq make-backup-files nil)
   (setq create-lockfiles nil)
 #+END_SRC
-** Set Default Browser
-When I open a link in emacs, I'd like it to use eww rather than
-firefox.  This is mostly for hackernews.
-#+BEGIN_SRC emacs-lisp
-  (setq browse-url-browser-function 'browse-url-w3)
-#+END_SRC
 * Custom Functions
 ** Electric-pair-inhibit
 * User Interface
@@ -648,6 +642,12 @@ I think it's cool to be able to read hackernews articles in emacs
 #+BEGIN_SRC emacs-lisp
   (autoload 'hackernews "hackernews" nil t)
 #+END_SRC
+
+Set a global keybinding to open hackernews
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c y") 'hackernews)
+#+end_src
+
 
 Save a hackernews URL and append it to a file for saved posts
 #+begin_src emacs-lisp
