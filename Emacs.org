@@ -412,7 +412,7 @@ hotkeys
     (concat (file-name-as-directory org-directory) filename))
 
   (defconst org-archive-file "~/Org-Files/Archive/archive-2021.org")
-  (defconst org-todo-file "~/Org-Files/todo/todo.org")
+  (defconst org-todo-file "~/Org-Files/todo.org")
 
   (setq org-agenda-files (list org-todo-file))
 
