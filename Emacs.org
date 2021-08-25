@@ -294,10 +294,10 @@ Ensure Dashboard loads and is displayed when Emacs starts
 * Mode Line
 ** General Config
 #+BEGIN_SRC emacs-lisp
-(setq display-time-format "%l:%M %p %b %y"
-      display-time-default-load-average nil)
+  (setq display-time-format "%l:%M %p %b %y"
+	display-time-default-load-average nil)
 
-(use-package diminish)
+  (use-package diminish)
 #+END_SRC
 
 * Key Bindings
@@ -306,14 +306,6 @@ I don't use this very much, but it's nice to include anyways.
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+END_SRC
-** Always kill current buffer
-DEBUG
-# #+begin_src emacs-lisp
-#   (defun hrs/kill-current-buffer ()
-#     "Kill the current buffer without prompting"
-#     (kill-buffer (current-buffer)))
-#   (global-set-key (kbd "C-x k") 'hrs/kill-current-buffer)
-# #+end_src
 ** Faster change window
 Using "C-x o" can get annoying after awhile, "M-o" is much easier
 #+begin_src emacs-lisp
@@ -378,6 +370,21 @@ electric-pair-mode added an extra ' where it shouldn't be
   (add-hook 'haskell-mode-hook 'haskell-doc-mode)
   (add-hook 'haskell-mode-hook 'haskell-mode-enable-process-minor-mode)
   (add-hook 'haskell-mode-hook 'hindent-mode)
+#+end_src
+** Lispy Langauges
+#+begin_src emacs-lisp
+  (use-package parinfer
+    :disabled
+    :hook ((emacs-lisp-mode . parinfer-mode)
+	   (common-lisp-mode . parinfer-mode)
+	   (scheme-mode . parinfer-mode)
+	   (lisp-mode . parinfer-mode))
+    :config
+    (setq parinfer-extensions
+	  '(defaults
+	     pretty-parens
+	     smart-tab
+	     smart-yank)))
 #+end_src
 ** Python
 *** Blacken-mode
@@ -636,20 +643,21 @@ Centaur tabs are great to have and make navigating lots of open buffers much eas
     :map helm-map
     ("<tab>" . helm-execute-persistent-action)))
 #+end_src
-* Misc
-** Hackernews
+* Hackernews
 I think it's cool to be able to read hackernews articles in emacs
 #+BEGIN_SRC emacs-lisp
   (autoload 'hackernews "hackernews" nil t)
+  (setq hackernews-items-per-page 50)
 #+END_SRC
 
 Set a global keybinding to open hackernews
 #+begin_src emacs-lisp
-(global-set-key (kbd "C-c y") 'hackernews)
+(global-set-key (kbd "C-x y") 'hackernews)
 #+end_src
 
-
-Save a hackernews URL and append it to a file for saved posts
+Grab a hackernews link and title, append it to a file for saved posts. I'd
+eventually want this to integrate with org-roam in some way, but this is fine
+for now.
 #+begin_src emacs-lisp
   (defun hackernews-save-link (url)
       (interactive (list (shr-url-at-point current-prefix-arg)))
@@ -662,6 +670,7 @@ Save a hackernews URL and append it to a file for saved posts
   (add-hook 'hackernews-mode-hook
 	    (lambda () (local-set-key (kbd "C-c C-s") #'hackernews-save-link)))
 #+end_src
+* Misc
 ** Alerts
 =alert-toast= is a great library for windows notifications.
 I've got a few projects planned that involve notifications,
