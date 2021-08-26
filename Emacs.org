@@ -452,6 +452,17 @@ Open an org-mode file with all buffers collapsed
   (setq org-startup-folded t)
 #+end_src
 
+Disable auto sub/superscript when exporting from org mode
+#+begin_src emacs-lisp
+  (setq org-export-with-sub-superscripts nil)
+#+end_src
+
+It's nice to hide emphasis markers but, depending on the font you're using, it
+can be difficult to see where you've added a code block, italics, etc. so I have
+this disabled for better readablity
+#+begin_src emacs-lisp
+(setq org-hide-emphasis-markers nil)
+#+end_src
 ** Org-Bullets
 #+BEGIN_SRC emacs-lisp
   (require 'org-bullets)
@@ -496,9 +507,6 @@ a lot of LaTeX.
 
   ;; Use syntax highlighting in source blocks
   (setq org-src-fontify-natively t)
-
-  ;; Hide emphasis markers like // or **
-  (setq org-hide-emphasis-markers t)
 
   ;; Use the current window when editing a code snippet
   (setq org-src-window-setup 'current-window)
