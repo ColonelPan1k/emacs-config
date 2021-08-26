@@ -643,6 +643,14 @@ Centaur tabs are great to have and make navigating lots of open buffers much eas
     :map helm-map
     ("<tab>" . helm-execute-persistent-action)))
 #+end_src
+* eww
+Set default variables for eww
+#+begin_src emacs-lisp
+  (setq
+   browse-url-browser-function 'eww-browse-url
+   shr-indentation 2
+   shr-width 80)
+#+end_src
 * Hackernews
 I think it's cool to be able to read hackernews articles in emacs
 #+BEGIN_SRC emacs-lisp
@@ -679,19 +687,3 @@ so it's nice to have this around.
 #+BEGIN_SRC emacs-lisp
   (require 'alert-toast)
 #+END_SRC
-
-** w3m
-#+begin_src emacs-lisp
-  (setq browse-url-browser-function 'w3m-browse-url)
-  (autoload 'w3m-browse-url "w3m" "Ask a www browser to show a url" t)
-  (global-set-key "\C-xm" 'browse-url-at-point)
-#+end_src
-
-Change the margins.  I mostly use w3m to read articles
-#+begin_src emacs-lisp
-  (defun set-margins()
-    (setq left-margin-width 200)
-    (setq right-margin-width 200))
-
-  (add-hook 'w3m-mode-hook 'set-margins)
-#+end_src
