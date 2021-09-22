@@ -342,10 +342,6 @@ way to open the file quickly and save a few keystrokes
 
   (global-set-key (kbd "C-c t") 'open-todo)
 #+END_SRC
-** Open link in firefox
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-c C-f") 'browse-url-firefox)
-#+end_src
 * Programming Language Config
 ** Emacs-lisp
 I've spent way too long debugging my config file just to realize that
