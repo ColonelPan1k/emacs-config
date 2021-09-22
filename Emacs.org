@@ -459,6 +459,11 @@ this disabled for better readablity
 #+begin_src emacs-lisp
 (setq org-hide-emphasis-markers nil)
 #+end_src
+
+org-indent is kind of annoying and just gets in the way, I'd rather not have it
+#+begin_src emacs-lisp
+(setq org-indent-mode 'nil)
+#+end_src
 ** Org-Bullets
 #+BEGIN_SRC emacs-lisp
   (require 'org-bullets)
