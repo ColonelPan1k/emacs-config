@@ -554,6 +554,29 @@ Enable markdown exporting and remove some of the other export formats I'll never
 #+BEGIN_SRC emacs-lisp
   (setq org-export-backends '(html latex md))
 #+END_SRC
+** Org-Export-Markdown Extension
+This exports all top-level headings in an org document to separate markdown files
+eg:
+#+begin_example
+| * A
+| * B
+| * C
+#+end_example
+will export =A.md, B.md, C.md=
+#+begin_src emacs-lisp
+  ;; Credit to @Ashraz in the SystemCrafters discord for the code
+  (defun colonelpan1k/escape-heading (heading)
+    "Remove non-alphanumeric characters from HEADING."
+    (replace-regexp-in-string "[^[:alnum:]]+" "-" heading))
+
+  (save-excursion
+    (goto-char (point-min))
+    (org-map-entries  (lambda ()
+			(let ((heading (nth 4 (org-heading-components))))
+			  (when heading
+			    (org-export-to-file 'md (concat (colonelpan1k/escape-heading heading) ".md") nil t))))
+		      "LEVEL=1"))
+#+end_src
 * Org-Roam
 Org-Roam and the Zettelkasten method seems like an extremely useful tool to have when
 reading/learning about anything.  I'm already hooked on org-roam.
