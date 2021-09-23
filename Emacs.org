@@ -570,13 +570,17 @@ will export =A.md, B.md, C.md=
     "Remove non-alphanumeric characters from HEADING."
     (replace-regexp-in-string "[^[:alnum:]]+" "-" heading))
 
-  (save-excursion
-    (goto-char (point-min))
-    (org-map-entries  (lambda ()
-			(let ((heading (nth 4 (org-heading-components))))
-			  (when heading
-			    (org-export-to-file 'md (concat (colonelpan1k/escape-heading heading) ".md") nil t))))
-		      "LEVEL=1"))
+  (defun colonelpan1k/export-individual-headings ()
+    (interactive)
+    (save-excursion
+      (goto-char (point-min))
+      (org-map-entries (lambda ()
+			 (let ((heading (nth 4 (org-heading-components))))
+			   (when heading
+			     (org-export-to-file 'md (concat (colonelpan1k/escape-heading heading) ".md") nil t))))
+		       "LEVEL=1")))
+
+    (define-key org-mode-map (kbd "C-c C-i") 'colonelpan1k/export-individual-headings)
 #+end_src
 * Org-Roam
 Org-Roam and the Zettelkasten method seems like an extremely useful tool to have when
