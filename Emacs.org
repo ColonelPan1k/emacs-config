@@ -388,6 +388,19 @@ Blacken linting is great and auto-formats python files on save.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'python-mode-hook 'blacken-mode)
 #+END_SRC
+*** Elpy
+Get Elpy working so I'm not writing python in 1967
+
+#+begin_src emacs-lisp
+  (use-package elpy)
+  (elpy-enable)
+#+end_src
+
+*** Syntax Checking
+#+begin_src emacs-lisp
+(use-package flycheck)
+#+end_src
+*** Auto-Complete
 ** Scheme
 ** YAML
 #+begin_src emacs-lisp
