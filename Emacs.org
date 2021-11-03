@@ -439,6 +439,12 @@ Properly handle =tsx= files:
 #+end_src
 
 ** Scheme
+** Vue
+Open all =.vue= files in web-mode by default
+#+begin_src emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
+#+end_src
+
 ** YAML
 #+begin_src emacs-lisp
   (require 'yaml-mode)
