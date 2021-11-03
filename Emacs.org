@@ -401,6 +401,7 @@ Get Elpy working so I'm not writing python in 1967
 (use-package flycheck)
 #+end_src
 *** Auto-Complete
+** TypeScript
 Setup basic config for typescript files, auto-format and lint files on save
 #+begin_src emacs-lisp
   (use-package tide :ensure t)
@@ -421,6 +422,20 @@ Setup basic config for typescript files, auto-format and lint files on save
   (add-hook 'before-save-hook 'tide-format-before-save)
 
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
+#+end_src
+
+Properly handle =tsx= files:
+#+begin_src emacs-lisp
+  (require 'web-mode)
+
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+
+  (add-hook 'web-mode-hook
+	    (lambda ()
+	      (when (string-equal "tsx" (file-name-extension buffer-file-name))
+		(setup-tide-mode))))
+
+  (flycheck-add-mode 'typescript-tslint 'web-mode)
 #+end_src
 
 ** Scheme
