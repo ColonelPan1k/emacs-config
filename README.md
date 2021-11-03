@@ -27,10 +27,6 @@ and with more functionality than whatever was outside of emacs).
 ## Changes
 
 Some of the changes I've made since I last updated my emacs config:
-- Properly setup and configure Org-roma
-  - Learn what all the fuss is about with org-roam
-	- Learn that I too am now part of the fuss with org-roam
-	  (seriously, it's the best possible program for note taking)
 - Set up helm autocompletion
 - Hackernews dashboard reader
 - Ignore certain electric-pair-mode pairs in specific buffers
