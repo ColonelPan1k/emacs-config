@@ -39,13 +39,13 @@ Some of the changes I've made since I last updated my emacs config:
 - Properly configure source blocks and add shortcuts
   for different programming languages
 - Edit emacs lock file handling so it doesn't keep freaking out FastAPI
-
+- Add support for python and typescript autocomplete, auto-linting
 
 ## Things left to do
 
 - Learn and configure magit
   - Move zsh git aliases to magit (things like gsb, gcmsg, etc)
-- Find a python autocomplete framework that works and isn't slow
+- ~~Find a python autocomplete framework that works and isn't slow~~
 - Anything else that pops up and needs a quick fix
 - Properly learn emacs lisp
 
