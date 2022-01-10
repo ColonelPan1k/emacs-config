@@ -501,6 +501,7 @@ Disable electric-pair-mode for '<' in org-mode.  This fixes source blocks.
 		      (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
 #+end_src
 
+
 Open an org-mode file with all buffers collapsed
 #+begin_src emacs-lisp
   (setq org-startup-folded t)
@@ -518,9 +519,10 @@ this disabled for better readablity
 (setq org-hide-emphasis-markers nil)
 #+end_src
 
-org-indent is kind of annoying and just gets in the way, I'd rather not have it
+Disable electric-indent-mode.  This is beyond annoying when trying to type anything that isn't code.
 #+begin_src emacs-lisp
-(setq org-indent-mode 'nil)
+  (add-hook 'electric-indent-functions
+	    (lambda (x) (when (eq'org-mode major-mode) 'no-indent)))
 #+end_src
 ** Org-Bullets
 #+BEGIN_SRC emacs-lisp
