@@ -524,6 +524,21 @@ Disable electric-indent-mode.  This is beyond annoying when trying to type anyth
   (add-hook 'electric-indent-functions
 	    (lambda (x) (when (eq'org-mode major-mode) 'no-indent)))
 #+end_src
+
+Custom keybind to set a 25min pomodoro timer
+#+begin_src emacs-lisp
+  (defun org-pom ()
+    "Start a pomodoro timer using org-timer"
+    (interactive)
+    (org-timer-set-timer 25))
+
+(global-set-key (kbd "M-p") 'org-pom)
+#+end_src
+
+Custom keybind to stop a timer
+#+begin_src emacs-lisp
+(global-set-key (kbd "M-[") 'org-timer-stop)
+#+end_src
 ** Org-Bullets
 #+BEGIN_SRC emacs-lisp
   (require 'org-bullets)
