@@ -1,5 +1,3 @@
-#+OPTIONS: toc:2
-
 * Startup
 ** Use-package
 #+BEGIN_SRC emacs-lisp
