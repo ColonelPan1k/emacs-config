@@ -758,7 +758,7 @@ Centaur tabs are great to have and make navigating lots of open buffers much eas
 Set default variables for eww
 #+begin_src emacs-lisp
   (setq
-   browse-url-browser-function 'browse-url-firefox
+   browse-url-browser-function 'w3m-browse-url
    shr-indentation 2
    shr-width 80)
 #+end_src
