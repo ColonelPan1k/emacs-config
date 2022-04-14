@@ -705,8 +705,12 @@ Centaur tabs are great to have and make navigating lots of open buffers much eas
     ("C-<" . centaur-tabs-backward)
     ("C->" . centaur-tabs-forward))
 
+  (centaur-tabs-group-by-projectile-project)
+  (centaur-tabs-enable-buffer-reordering)
   (centaur-tabs-headline-match)
-  (setq centaur-tabs-style "box")
+
+  (setq centaur-tabs-cycle-scope 'default)
+  (setq centaur-tabs-style "chamfer")
 
   (setq centaur-tabs-height 36)
 
