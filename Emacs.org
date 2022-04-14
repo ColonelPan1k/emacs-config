@@ -238,17 +238,10 @@ other themes I've used extensively in the past but Cyberpunk just looks the cool
 Dashboard is probably my favorite emacs package.  It's great to give emacs a
 proper, configurable splash screen with information you actually want to see.
 
-#+BEGIN_SRC emacs-lisp
-  (use-package dashboard-hackernews
-    :config
-    (require 'json))
-#+END_SRC
-
 Ensure Dashboard loads and is displayed when Emacs starts
 #+BEGIN_SRC emacs-lisp
   (use-package dashboard
     :ensure t
-    :after dashboard-hackernews
     :config
     (dashboard-setup-startup-hook))
 #+END_SRC
@@ -256,17 +249,15 @@ Ensure Dashboard loads and is displayed when Emacs starts
 #+BEGIN_SRC emacs-lisp
   (setq dashboard-startup-banner "~/.emacs.d/img/magi.png")
   (setq dashboard-center-content t)
+  (setq dashboard-show-shortcuts t)
 
   (setq dashboard-items '((recents . 7)
-			  (projects . 7)
-			  (agenda . 7)
-			  (hackernews . 7)))
+			  (agenda . 7)))
+
   (setq dashboard-item-shortcuts '((recents . "r")
 				   (bookmarks . "m")
-				   (projects . "p")
 				   (agenda . "a")
-				   (registers . "e")
-				   (hackernews . "k")))
+				   (registers . "e")))
 
   (setq dashboard-week-agenda t)
 
