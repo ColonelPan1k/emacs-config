@@ -386,12 +386,16 @@ Blacken linting is great and auto-formats python files on save.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'python-mode-hook 'blacken-mode)
 #+END_SRC
-*** Elpy
-Get Elpy working so I'm not writing python in 1967
-
+** Pylint/ Flycheck
 #+begin_src emacs-lisp
-  (use-package elpy)
-  (elpy-enable)
+  (add-hook 'after-init-hook #'global-flycheck-mode)
+#+end_src
+*** Elpy
+#+begin_src emacs-lisp
+  (use-package elpy
+    :ensure t
+    :init
+    (elpy-enable))
 #+end_src
 
 *** Syntax Checking
@@ -399,50 +403,7 @@ Get Elpy working so I'm not writing python in 1967
 (use-package flycheck)
 #+end_src
 *** Auto-Complete
-** TypeScript
-Setup basic config for typescript files, auto-format and lint files on save
-#+begin_src emacs-lisp
-  (use-package tide :ensure t)
-  (use-package company :ensure t)
-  (use-package flycheck :ensure t)
-
-  (defun setup-tide-mode ()
-    (interactive)
-    (tide-setup)
-    (flycheck-mode +1)
-    (setq flycheck-check-syntax-automatically '(save mode-enabled))
-    (eldoc-mode +1)
-    (tide-hl-identifier-mode +1)
-    (company-mode +1))
-
-  (setq company-tooltip-align-annotations t)
-
-  (add-hook 'before-save-hook 'tide-format-before-save)
-
-  (add-hook 'typescript-mode-hook #'setup-tide-mode)
-#+end_src
-
-Properly handle =tsx= files:
-#+begin_src emacs-lisp
-  (require 'web-mode)
-
-  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-
-  (add-hook 'web-mode-hook
-	    (lambda ()
-	      (when (string-equal "tsx" (file-name-extension buffer-file-name))
-		(setup-tide-mode))))
-
-  (flycheck-add-mode 'typescript-tslint 'web-mode)
-#+end_src
-
 ** Scheme
-** Vue
-Open all =.vue= files in web-mode by default
-#+begin_src emacs-lisp
-  (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
-#+end_src
-
 ** YAML
 #+begin_src emacs-lisp
   (require 'yaml-mode)
