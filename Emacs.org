@@ -729,11 +729,6 @@ Centaur tabs are great to have and make navigating lots of open buffers much eas
 
 #+END_SRC
 
-* Magit
-#+begin_src emacs-lisp
-  (use-package magit
-    :ensure t)
-#+end_src
 * Helm
 #+begin_src emacs-lisp
   (use-package helm
