@@ -270,8 +270,16 @@ Ensure Dashboard loads and is displayed when Emacs starts
 #+END_SRC
 ** Powerline
 #+BEGIN_SRC emacs-lisp
-(require 'powerline)
-(powerline-default-theme)
+  (require 'powerline)
+  (powerline-default-theme)
+  (custom-set-faces
+   '(powerline-active0 ((t (:inherit mode-line :family "DejaVu Sans Mono"))))
+   '(powerline-active1 ((t (:background "#103050" :foreground "#eaeaea" :family "DejaVu Sans Mono"))))
+   '(powerline-inactive0 ((t (:family "DejaVu Sans Mono"))))
+   '(powerline-inactive1 ((t (:background "grey11" :inherit mode-line-inactive :family "DejaVu Sans Mono"))))
+   '(powerline-inactive2 ((t (:family "DejaVu Sans Mono" :background "grey20" :inherit mode-line-inactive))))
+   )
+
 #+END_SRC
 * Default Coding System
 #+BEGIN_SRC emacs-lisp
