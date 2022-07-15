@@ -190,7 +190,7 @@ Load the current theme that I'm using. Suscolors and Seventies are also two
 other themes I've used extensively in the past but Cyberpunk just looks the coolest.
 
 #+BEGIN_SRC emacs-lisp
-  (load-theme 'afternoon t)
+  (load-theme 'gruvbox-dark-medium t)
 #+END_SRC
 ** Font
 *** Set the font
