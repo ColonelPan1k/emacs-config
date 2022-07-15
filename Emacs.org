@@ -4,7 +4,7 @@
   (require 'use-package)
   (setq use-package-always-ensure t)
 #+END_SRC
-** Kill Message Buffer
+** Kill Startup Buffers
 #+BEGIN_SRC emacs-lisp
   (setq-default message-log-max nil)
   (kill-buffer "*Messages*")
@@ -87,7 +87,7 @@ hook to measure startup time
 
 ** Load Sensible Defaults
 
-This is a greatdefault file from [[https://github.com/hrs][HRS]].  This has some seriously nice QOL improvements
+This is a great default file from [[https://github.com/hrs][HRS]].  This has some seriously nice QOL improvements
 that you might not think to add yourself.
 #+BEGIN_SRC emacs-lisp
 (load-file "~/.emacs.d/lisp/sensible-defaults.el")
