@@ -450,7 +450,15 @@ Blacken linting is great and auto-formats python files on save.
 #+begin_src emacs-lisp
 (use-package flycheck)
 #+end_src
-*** Auto-Complete
+*** Jedi Auto-Complete
+#+begin_src emacs-lisp
+(require 'epc)
+(setq jedi:setup-keys t)
+(setq jedi:server-command '("python" "/home/kyle/.emacs.d/elpa/jedi-core-20210503.1315/jediepcserver.py"))
+(setq jedi:tooltip-method '(pos-tip))
+(autoload 'jedi:setup "jedi" nil t)
+(add-hook 'python-mode-hook 'jedi:setup)
+#+end_src
 ** Scheme
 ** YAML
 #+begin_src emacs-lisp
