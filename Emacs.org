@@ -345,9 +345,6 @@ way to open the file quickly and save a few keystrokes
 #+END_SRC
 * IDE Features
 ** company
-#+begin_src emacs-lisp
-(use-package company :ensure t)
-#+end_src
 ** lsp-mode
 #+begin_src emacs-lisp
   (use-package lsp-mode
