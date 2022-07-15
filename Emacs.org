@@ -766,6 +766,16 @@ Centaur tabs are great to have and make navigating lots of open buffers much eas
     :map helm-map
     ("<tab>" . helm-execute-persistent-action)))
 #+end_src
+
+* Pylookup
+#+begin_src elisp
+  (eval-when-compile (require 'pylookup))
+  (setq pylookup-search-options '("--insensitive" "0" "--desc" "0"))
+  (autoload 'pylookup-lookup "pylookup"
+    "Lookup SEARCH-TERM in the Python HTML indexes." t)
+
+  (define-key elpy-mode-map (kbd "C-c C-d") 'pylookup-lookup)
+#+end_src
 * eww
 Set default variables for eww
 #+begin_src emacs-lisp
