@@ -42,6 +42,8 @@ This sets a specific file to load
   (add-to-list 'load-path "~/.emacs.d/init.el")
   (add-to-list 'load-path "~/.emacs.d/org-bullets")
   (add-to-list 'load-path "~/.emacs.d/lisp")
+  (add-to-list 'load-path "~/.emacs.d/pylookup")
+  (add-to-list 'load-path "~/.emacs.d/snippets")
   (load-file custom-file)
 #+END_SRC
 ** Startup Performance
