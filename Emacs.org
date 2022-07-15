@@ -372,11 +372,21 @@ way to open the file quickly and save a few keystrokes
 ** yasnippet
 #+begin_src emacs-lisp
   (use-package yasnippet
-    :ensure
-    :config
-    (yas-reload-all)
-    (add-hook 'prog-mode-hook 'yas-minor-mode)
-    (add-hook 'text-mode-hook 'yas-minor-mode))
+    :ensure t
+    :hook ((text-mode
+	    prog-mode
+	    conf-mode
+	    snippet-mode) . yas-minor-mode-on)
+    :init
+    (setq yas-snippet-dir "~/.emacs.d/snippets"))
+
+#+end_src
+** Color-Identifiers-Mode
+This package makes code a bit more readable by adding
+individual syntax highlighting on variables. It's nice to have
+and helps improve code readability at a glance.
+#+begin_src emacs-lisp
+(add-hook 'after-init-hook 'global-color-identifiers-mode)
 #+end_src
 * Programming Language Config
 ** Emacs-lisp
