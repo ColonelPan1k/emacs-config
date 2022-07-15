@@ -170,6 +170,7 @@ Hide startup splash screen
 #+BEGIN_SRC emacs-lisp
   (setq inhibit-startup-screen t
         inhibit-scratch-message t)
+  (setq initial-major-mode 'dashboard-mode)
 #+END_SRC
 ** Tabs and Formatting
 #+BEGIN_SRC emacs-lisp
