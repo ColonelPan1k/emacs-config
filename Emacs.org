@@ -429,12 +429,21 @@ electric-pair-mode added an extra ' where it shouldn't be
 	     smart-yank)))
 #+end_src
 ** Python
+*** Python Config
+#+begin_src emacs-lisp
+(setq-default py-shell-name "ipython")
+(setq python-shell-interpreter "python3.10")
+(setq flycheck-python-pycompile-executable "python3.10")
+(require 'poetry)
+#+end_src
+
 *** Blacken-mode
 Blacken linting is great and auto-formats python files on save.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'python-mode-hook 'blacken-mode)
 #+END_SRC
-** Pylint/ Flycheck
+
+*** Pylint/ Flycheck
 #+begin_src emacs-lisp
   (add-hook 'after-init-hook #'global-flycheck-mode)
 #+end_src
