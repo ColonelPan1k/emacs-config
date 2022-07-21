@@ -434,12 +434,6 @@ electric-pair-mode added an extra ' where it shouldn't be
 (require 'poetry)
 #+end_src
 
-*** Blacken-mode
-Blacken linting is great and auto-formats python files on save.
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'python-mode-hook 'blacken-mode)
-#+END_SRC
-
 *** Pylint/ Flycheck
 #+begin_src emacs-lisp
   (add-hook 'after-init-hook #'global-flycheck-mode)
@@ -451,7 +445,14 @@ Blacken linting is great and auto-formats python files on save.
     :init
     (elpy-enable))
 #+end_src
-
+*** Blacken-mode
+Blacken linting is great and auto-formats python files on save.
+#+begin_src emacs-lisp
+(use-package python-black
+  :demand t
+  :after python
+  :hook (elpy-mode . python-black-on-save-mode-enable-dwim))
+#+end_src
 *** Syntax Checking
 #+begin_src emacs-lisp
 (use-package flycheck)
