@@ -1,4 +1,18 @@
 * Startup
+** Speed up init times
+Don't know if this really does improve startup times but it can't hurt right?
+
+Set garbage collection threshold
+#+begin_src emacs-lisp
+  (setq gc-cons-threhshold-original gc-cons-threshold)
+  (setq gc-cons-thresold (* 1024 1024 100))
+#+end_src
+
+Set file name handler alist
+#+begin_src emacs-lisp
+  (setq file-name-handler-alist-original file-name-handler-alist)
+  (setq file-name-handler-alist nil)
+#+end_src
 ** Use-package
 #+BEGIN_SRC emacs-lisp
   (require 'use-package)
