@@ -63,6 +63,17 @@ Set file name handler alist
   (require 'use-package)
   (setq use-package-always-ensure t)
 #+END_SRC
+** Update Packages Automatically
+#+begin_src emacs-lisp
+  (use-package auto-package-update
+    :custom
+    (auto-package-update-interval 7)
+    (auto-package-update-hide-resultst)
+    :config
+    (auto-package-update-maybe)
+    (auto-package-update-at-time "12:00"))
+#+end_src
+
 ** Load Customs File
 This sets a specific file to load
 
@@ -79,13 +90,7 @@ This sets a specific file to load
   (load-file custom-file)
 #+END_SRC
 ** Startup Performance
-Make startup faster by reducing the frequency of garbage collection and use a
-hook to measure startup time
-
 #+BEGIN_SRC emacs-lisp
-;; The default is 800 kilobytes.  Measured in bytes.
-(setq gc-cons-threshold (* 50 1000 1000))
-
 ;; Profile emacs startup
 (add-hook 'emacs-startup-hook
           (lambda ()
@@ -156,8 +161,6 @@ an issue.
   (setq make-backup-files nil)
   (setq create-lockfiles nil)
 #+END_SRC
-* Custom Functions
-** Electric-pair-inhibit
 * User Interface
 ** General UI Config
 Clean up the UI and make it look more minimal.  These are some of the first options
@@ -376,27 +379,30 @@ way to open the file quickly and save a few keystrokes
   (global-set-key (kbd "C-c t") 'open-todo)
 #+END_SRC
 * IDE Features
-** company
+** Sonarlint
+#+begin_src emacs-lisp
+(require 'lsp-sonarlint)
+(require 'lsp-sonarlint-python)
+(setq lsp-sonarlint-python-enabled t)
+#+end_src
 ** lsp-mode
 #+begin_src emacs-lisp
-  (use-package lsp-mode
-    :ensure
-    :commands lsp
-    :custom
-    (lsp-rust-analyzer-cargo-watch-command "clippy")
-    (lsp-eldoc-render-all t)
-    (lsp-idle-delay 0.6)
-    (lsp-rust-analyzer-server-display-inlay-hints t)
-    :config
-    (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+   (use-package lsp-mode
+     :ensure
+     :commands lsp
+     :config
+     (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+     :hook
+     ((python-mode . lsp)))
 
-  (use-package lsp-ui
-    :ensure
-    :commands lsp-ui-mode
-    :custom
-    (lsp-ui-peek-always-show t)
-    (lsp-ui-sideline-show-hover t)
-    (lsp-ui-doc-enable nil))
+
+   (use-package lsp-ui
+     :ensure
+     :commands lsp-ui-mode
+     :custom
+     (lsp-ui-peek-always-show t)
+     (lsp-ui-sideline-show-hover t))
+
 #+end_src
 ** yasnippet
 #+begin_src emacs-lisp
@@ -411,13 +417,37 @@ way to open the file quickly and save a few keystrokes
 
 #+end_src
 ** Color-Identifiers-Mode
-This package makes code a bit more readable by adding
-individual syntax highlighting on variables. It's nice to have
-and helps improve code readability at a glance.
 #+begin_src emacs-lisp
 (add-hook 'after-init-hook 'global-color-identifiers-mode)
 #+end_src
+** Electric Operator
+#+begin_src emacs-lisp
+(use-package electric-operator
+  :hook ((python-mode sql-mode) . electric-operator-mode))
+#+end_src
 * Programming Language Config
+** C
+#+begin_src emacs-lisp
+(setq c-basic-offset 4)
+(setq-default c-electric-flag nil)
+(setq-default c-electic-brace nil)
+(add-to-list 'auto-mode-alist '("\\.c\\'" . ccls))
+
+#+end_src
+
+#+begin_src emacs-lisp
+(defun my-make-CR-do-indent ()
+  (define-key c-mode-base-map "\C-m" 'c-context-line-break))
+(add-hook 'c-initialization-hook 'my-make-CR-do-indent)
+#+end_src
+
+** Common Lisp / Slime
+#+begin_src emacs-lisp
+  (setq inferior-lisp-program "sbcl")
+  (require 'slime)
+  (slime-setup '(slime-fancy slime-tramp slime-asdf))
+  (slime-require :swank-listener-hooks)
+#+end_src
 ** Emacs-lisp
 I've spent way too long debugging my config file just to realize that
 electric-pair-mode added an extra ' where it shouldn't be
@@ -466,37 +496,45 @@ electric-pair-mode added an extra ' where it shouldn't be
 (require 'poetry)
 #+end_src
 
-*** Pylint/ Flycheck
-#+begin_src emacs-lisp
-  (add-hook 'after-init-hook #'global-flycheck-mode)
-#+end_src
-*** Elpy
-#+begin_src emacs-lisp
-  (use-package elpy
-    :ensure t
-    :init
-    (elpy-enable))
-#+end_src
 *** Blacken-mode
 Blacken linting is great and auto-formats python files on save.
 #+begin_src emacs-lisp
 (use-package python-black
   :demand t
   :after python
-  :hook (elpy-mode . python-black-on-save-mode-enable-dwim))
+  :hook (python-mode . python-black-on-save-mode))
 #+end_src
-*** Syntax Checking
+*** isort
 #+begin_src emacs-lisp
-(use-package flycheck)
+    (add-hook 'python-mode-hook 'python-isort-on-save-mode)
 #+end_src
-*** Jedi Auto-Complete
+** Rust
+Set up basic rust mode config
 #+begin_src emacs-lisp
-(require 'epc)
-(setq jedi:setup-keys t)
-(setq jedi:server-command '("python" "/home/kyle/.emacs.d/elpa/jedi-core-20210503.1315/jediepcserver.py"))
-(setq jedi:tooltip-method '(pos-tip))
-(autoload 'jedi:setup "jedi" nil t)
-(add-hook 'python-mode-hook 'jedi:setup)
+  (use-package rust-mode
+      :defer t
+      :ensure t
+      :init
+	(add-hook 'rust-mode-hook
+		(lambda () (setq indent-tabs-mode nil)))
+	(setq rust-format-on-save t)
+	(add-hook 'rust-mode-hook
+	    (lambda () (prettify-symbols-mode)))
+	(add-hook 'rust-mode-hook #'lsp)
+      :bind (("M-," . rust-compile))
+      (add-hook 'before-save-hook
+	      (lambda ()
+		(when (eq major-mode 'rust-mode)
+		  (rust-format-buffer)))))
+
+  (use-package racer
+    :ensure t)
+#+end_src
+
+** SQL
+#+begin_src emacs-lisp
+  (setq sqlformat-command 'sqlfluff)
+  (add-hook 'sql-mode-hook 'sqlformat-on-save-mode)
 #+end_src
 ** Scheme
 ** YAML
@@ -811,15 +849,6 @@ Centaur tabs are great to have and make navigating lots of open buffers much eas
     ("<tab>" . helm-execute-persistent-action)))
 #+end_src
 
-* Pylookup
-#+begin_src elisp
-  (eval-when-compile (require 'pylookup))
-  (setq pylookup-search-options '("--insensitive" "0" "--desc" "0"))
-  (autoload 'pylookup-lookup "pylookup"
-    "Lookup SEARCH-TERM in the Python HTML indexes." t)
-
-  (define-key elpy-mode-map (kbd "C-c C-d") 'pylookup-lookup)
-#+end_src
 * eww
 Set default variables for eww
 #+begin_src emacs-lisp
@@ -855,8 +884,7 @@ for now.
   (add-hook 'hackernews-mode-hook
 	    (lambda () (local-set-key (kbd "C-c C-s") #'hackernews-save-link)))
 #+end_src
-* Misc
-** Alerts
+* Alerts
 =alert-toast= is a great library for windows notifications.
 I've got a few projects planned that involve notifications,
 so it's nice to have this around.
@@ -864,3 +892,17 @@ so it's nice to have this around.
 #+BEGIN_SRC emacs-lisp
   (require 'alert-toast)
 #+END_SRC
+* Avy
+This package makes it a lot easier to jump around a file.
+It's a lot easier to use than the default 'M-g g'
+#+begin_src emacs-lisp
+(require 'ivy-avy)
+(global-set-key (kbd "C-'") 'avy-goto-line)
+(global-set-key (kbd "C-:") 'avy-goto-char-2)
+#+end_src
+* Vundo
+#+begin_src emacs-lisp
+(require 'vundo)
+(global-set-key (kbd "M-/") 'vundo)
+(setq vundo-glyph-alist vundo-unicode-symbols)
+#+end_src
