@@ -1,18 +1,4 @@
 * Startup
-** Speed up init times
-Don't know if this really does improve startup times but it can't hurt right?
-
-Set garbage collection threshold
-#+begin_src emacs-lisp
-  (setq gc-cons-threhshold-original gc-cons-threshold)
-  (setq gc-cons-thresold (* 1024 1024 100))
-#+end_src
-
-Set file name handler alist
-#+begin_src emacs-lisp
-  (setq file-name-handler-alist-original file-name-handler-alist)
-  (setq file-name-handler-alist nil)
-#+end_src
 ** Use-package
 #+BEGIN_SRC emacs-lisp
   (require 'use-package)
@@ -28,24 +14,6 @@ Set file name handler alist
   (use-package all-the-icons)
   (setq inhibit-compacting-font-cache t)
 #+END_SRC
-** Exec-Path from shell
-#+begin_src emacs-lisp
-  (defun set-exec-path-from-shell-PATH ()
-    "Set up Emacs' `exec-path' and PATH environment variable to match
-  that used by the user's shell.
-
-  This is particularly useful under Mac OS X and macOS, where GUI
-  apps are not started from a shell."
-    (interactive)
-    (let ((path-from-shell (replace-regexp-in-string
-			    "[ \t\n]*$" "" (shell-command-to-string
-					    "$SHELL --login -c 'echo $PATH'"
-						      ))))
-      (setenv "PATH" path-from-shell)
-      (setq exec-path (split-string path-from-shell path-separator))))
-
-  (set-exec-path-from-shell-PATH)
-#+end_src
 * Package Management
 #+BEGIN_SRC emacs-lisp
   ;; Initialize package sources
@@ -111,7 +79,6 @@ This sets a specific file to load
   :config
   (setq auto-package-update-delete-old-versions t))
 #+END_SRC
-
 ** Load Sensible Defaults
 
 This is a great default file from [[https://github.com/hrs][HRS]].  This has some seriously nice QOL improvements
@@ -317,15 +284,6 @@ Ensure Dashboard loads and is displayed when Emacs starts
   (set-selection-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
 #+END_SRC
-* Mode Line
-** General Config
-#+BEGIN_SRC emacs-lisp
-  (setq display-time-format "%l:%M %p %b %y"
-	display-time-default-load-average nil)
-
-  (use-package diminish)
-#+END_SRC
-
 * Key Bindings
 ** ESC Cancels All
 I don't use this very much, but it's nice to include anyways.
@@ -345,17 +303,6 @@ I edit my config file a lot.  It's nice to have a quick way to access it.
     (find-file "~/dev/Emacs_config/Emacs.org"))
   (global-set-key (kbd "C-c e") 'config-visit)
 #+END_SRC
-** Open Work Descriptions File
-This file keeps track of what I've done at work each day and helps with
-general work-related logging
-
-#+BEGIN_SRC emacs-lisp
-  (defun open-daily-desc ()
-    (interactive)
-    (find-file "~/Org-Files/Work/Daily-Descriptions.org"))
-
-  (global-set-key (kbd "C-c d") 'open-daily-desc)
-#+END_SRC
 ** Open Org-Todo File
 I know there's already a keybinding `C-c a t'` for opening the org-todo menu,
 but I have a lot of nested tasks within my daily TODOs so it's nice to have a
@@ -368,44 +315,11 @@ way to open the file quickly and save a few keystrokes
 
   (global-set-key (kbd "C-c t") 'open-todo)
 #+END_SRC
+** C-; Comments Line instead of C-x C-;
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-;") 'comment-line)
+#+end_src
 * IDE Features
-** Sonarlint
-#+begin_src emacs-lisp
-(require 'lsp-sonarlint)
-(require 'lsp-sonarlint-python)
-(setq lsp-sonarlint-python-enabled t)
-#+end_src
-** lsp-mode
-#+begin_src emacs-lisp
-   (use-package lsp-mode
-     :ensure
-     :commands lsp
-     :config
-     (add-hook 'lsp-mode-hook 'lsp-ui-mode)
-     :hook
-     ((python-mode . lsp)))
-
-
-   (use-package lsp-ui
-     :ensure
-     :commands lsp-ui-mode
-     :custom
-     (lsp-ui-peek-always-show t)
-     (lsp-ui-sideline-show-hover t))
-
-#+end_src
-** yasnippet
-#+begin_src emacs-lisp
-  (use-package yasnippet
-    :ensure t
-    :hook ((text-mode
-	    prog-mode
-	    conf-mode
-	    snippet-mode) . yas-minor-mode-on)
-    :init
-    (setq yas-snippet-dir "~/.emacs.d/snippets"))
-
-#+end_src
 ** Color-Identifiers-Mode
 #+begin_src emacs-lisp
 (add-hook 'after-init-hook 'global-color-identifiers-mode)
@@ -413,138 +327,67 @@ way to open the file quickly and save a few keystrokes
 ** Electric Operator
 #+begin_src emacs-lisp
 (use-package electric-operator
-  :hook ((python-mode sql-mode) . electric-operator-mode))
-#+end_src
-* Programming Language Config
-** C
-#+begin_src emacs-lisp
-(setq c-basic-offset 4)
-(setq-default c-electric-flag nil)
-(setq-default c-electic-brace nil)
-(add-to-list 'auto-mode-alist '("\\.c\\'" . ccls))
-
-#+end_src
-
-#+begin_src emacs-lisp
-(defun my-make-CR-do-indent ()
-  (define-key c-mode-base-map "\C-m" 'c-context-line-break))
-(add-hook 'c-initialization-hook 'my-make-CR-do-indent)
-#+end_src
-
-** Common Lisp / Slime
-#+begin_src emacs-lisp
-  (setq inferior-lisp-program "sbcl")
-  (require 'slime)
-  (slime-setup '(slime-fancy slime-tramp slime-asdf))
-  (slime-require :swank-listener-hooks)
-#+end_src
-** Emacs-lisp
-I've spent way too long debugging my config file just to realize that
-electric-pair-mode added an extra ' where it shouldn't be
-#+begin_src emacs-lisp
-    (add-hook
-     'emacs-lisp-mode-hook
-     (lambda ()
-       (setq-local electric-pair-inhibit-predicate
-		   `(lambda (c)
-		      (if (char-equal c ?') t (,electric-pair-inhibit-predicate c))))))
-#+end_src
-** Haskell
-#+begin_src emacs-lisp
-  (use-package haskell-mode)
-
-  (setq haskell-process-type 'cabal-repl)
-  (setq haskell-process-log t)
-
-  (add-hook 'haskell-mode-hook 'haskell-indent-mode)
-  (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
-  (add-hook 'haskell-mode-hook 'haskell-doc-mode)
-  (add-hook 'haskell-mode-hook 'haskell-mode-enable-process-minor-mode)
-  (add-hook 'haskell-mode-hook 'hindent-mode)
-#+end_src
-** Lispy Langauges
-#+begin_src emacs-lisp
-  (use-package parinfer
-    :disabled
-    :hook ((emacs-lisp-mode . parinfer-mode)
-	   (common-lisp-mode . parinfer-mode)
-	   (scheme-mode . parinfer-mode)
-	   (lisp-mode . parinfer-mode))
-    :config
-    (setq parinfer-extensions
-	  '(defaults
-	     pretty-parens
-	     smart-tab
-	     smart-yank)))
+  :hook (python-mode . electric-operator-mode))
 #+end_src
 ** Python
-*** Python Config
 #+begin_src emacs-lisp
-(setq-default py-shell-name "ipython")
-(setq python-shell-interpreter "python3.10")
-(setq flycheck-python-pycompile-executable "python3.10")
-(require 'poetry)
-#+end_src
-
-*** Blacken-mode
-Blacken linting is great and auto-formats python files on save.
-#+begin_src emacs-lisp
-(use-package python-black
+(use-package blacken
   :demand t
   :after python
-  :hook (python-mode . python-black-on-save-mode))
-#+end_src
-*** isort
-#+begin_src emacs-lisp
-    (add-hook 'python-mode-hook 'python-isort-on-save-mode)
-#+end_src
-** Rust
-Set up basic rust mode config
-#+begin_src emacs-lisp
-  (use-package rust-mode
-      :defer t
-      :ensure t
-      :init
-	(add-hook 'rust-mode-hook
-		(lambda () (setq indent-tabs-mode nil)))
-	(setq rust-format-on-save t)
-	(add-hook 'rust-mode-hook
-	    (lambda () (prettify-symbols-mode)))
-	(add-hook 'rust-mode-hook #'lsp)
-      :bind (("M-," . rust-compile))
-      (add-hook 'before-save-hook
-	      (lambda ()
-		(when (eq major-mode 'rust-mode)
-		  (rust-format-buffer)))))
-
-  (use-package racer
-    :ensure t)
+  :hook (python-mode . blacken-mode))
 #+end_src
 
-** SQL
+Company Mode config
 #+begin_src emacs-lisp
-  (setq sqlformat-command 'sqlfluff)
-  (add-hook 'sql-mode-hook 'sqlformat-on-save-mode)
-#+end_src
-** Scheme
-** YAML
-#+begin_src emacs-lisp
-  (require 'yaml-mode)
-  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+  (setq company-idle-delay
+	(lambda () (if (company-in-string-or-comment) nil 0)))
+  (setq company-require-match nil)
+  (setq company-tooltip-align-annotations t)
+  (setq company-tooltip-flip-when-above t)
+  (setq company-dabbrev-minimum-length 2)
+  (defun company-jedi-setup ()
+    (add-to-list 'company-backends 'company-jedi))
+  (add-hook 'python-mode-hook 'company-jedi-setup)
+
+  (add-hook 'after-init-hook 'global-company-mode)
 #+end_src
 
-Make yaml-mode snap to indent level of a newline
 #+begin_src emacs-lisp
-  (add-hook 'yaml-mode-hook
-    '(lambda ()
-       (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
+(require 'flymake)
 
+(defun flymake-python-mypy-init ()
+  (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                     'flymake-create-temp-inplace))
+         (local-file (file-relative-name
+                      temp-file
+                      (file-name-directory buffer-file-name))))
+    (list "mypy" (list local-file))))
+
+(add-to-list 'flymake-allowed-file-name-masks
+             '("\\.py\\'" flymake-python-mypy-init))
+
+(add-hook 'python-mode-hook 'flymake-mode)
 #+end_src
-*** Poetry.el
+
 #+begin_src emacs-lisp
-(use-package poetry
-  :ensure t)
+  (use-package elpy
+    :ensure t
+    :init
+    (elpy-enable))
 #+end_src
+
+
+#+begin_src emacs-lisp
+(require 'which-func)
+(which-function-mode t)
+#+end_src
+
+#+begin_src emacs-lisp
+  (add-hook 'python-mode-hook 'python-isort-on-save-mode)
+  (add-hook 'python-mode-hook 'company-mode)
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+#+end_src
+
 * Org-Mode
 ** General Settings
 Startup org, set some important default locations, and add source block
@@ -608,16 +451,6 @@ Disable electric-indent-mode.  This is beyond annoying when trying to type anyth
 #+begin_src emacs-lisp
   (add-hook 'electric-indent-functions
 	    (lambda (x) (when (eq'org-mode major-mode) 'no-indent)))
-#+end_src
-
-Custom keybind to set a 25min pomodoro timer
-#+begin_src emacs-lisp
-  (defun org-pom ()
-    "Start a pomodoro timer using org-timer"
-    (interactive)
-    (org-timer-set-timer 25))
-
-(global-set-key (kbd "M-p") 'org-pom)
 #+end_src
 
 Custom keybind to stop a timer
@@ -742,31 +575,6 @@ will export =A.md, B.md, C.md=
 
     (define-key org-mode-map (kbd "C-c C-i") 'colonelpan1k/export-individual-headings)
 #+end_src
-* Org-Roam
-Org-Roam and the Zettelkasten method seems like an extremely useful tool to have when
-reading/learning about anything.  I'm already hooked on org-roam.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org-roam
-    :ensure t
-    :init
-    (setq org-roam-v2-ack t)
-    :custom
-    (org-roam-directory (file-truename "~/Org-Files/roam"))
-    :bind (("C-c n l" . org-roam-buffer-toggle)
-	   ("C-c n f" . org-roam-node-find)
-	   ("C-c n i" . org-roam-node-insert)
-	   ("C-c n g" . org-roam-graph)
-	   ("C-c n c" . org-roam-capture)
-	   ("C-c n j" . org-roam-dailies-capture-today))
-    :config
-    (org-roam-setup)
-    (require 'org-roam-protocol))
-#+END_SRC
-
-#+begin_src emacs-lisp
-  (setq org-roam-graph-viewer #'eww-open-file)
-#+end_src
 * Org-Babel
 ** Source Blocks
 #+BEGIN_SRC emacs-lisp
@@ -780,13 +588,6 @@ reading/learning about anything.  I'm already hooked on org-roam.
      (C . t)
      (haskell . t)))
 #+END_SRC
-* Flycheck
-I should proabaly remove this since I can rarely get flycheck to work properly.
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :defer t
-    :hook (lsp-mode . flycheck-mode))
-#+END_SRC
 * Centaur Tabs
 Centaur tabs are great to have and make navigating lots of open buffers much easier
 #+BEGIN_SRC emacs-lisp
@@ -798,7 +599,6 @@ Centaur tabs are great to have and make navigating lots of open buffers much eas
     ("C-<" . centaur-tabs-backward)
     ("C->" . centaur-tabs-forward))
 
-  (centaur-tabs-group-by-projectile-project)
   (centaur-tabs-enable-buffer-reordering)
   (centaur-tabs-headline-match)
 
@@ -824,75 +624,33 @@ Centaur tabs are great to have and make navigating lots of open buffers much eas
 
 * Helm
 #+begin_src emacs-lisp
-  (use-package helm
-    :config
-    (require 'helm-config)
-    :init
-    (helm-mode 1)
-    :bind
-    (("M-x" . helm-M-x)
-     ("C-x C-f" . helm-find-files)
+ (use-package helm
+  :config
+   (require 'helm-config)
+  :init
+  (helm-mode 1)
+  :bind
+  (("M-x" . helm-M-x)
+    ("C-x C-f" . helm-find-files)
      ("C-x b" . helm-buffers-list)
-     ("M-y" . helm-show-kill-ring)
+    ("M-y" . helm-show-kill-ring)
      ("C-s" . helm-occur)
     :map helm-map
     ("<tab>" . helm-execute-persistent-action)))
 #+end_src
 
-* eww
-Set default variables for eww
-#+begin_src emacs-lisp
-  (setq
-   browse-url-browser-function 'w3m-browse-url
-   shr-indentation 2
-   shr-width 80)
-#+end_src
-* Hackernews
-I think it's cool to be able to read hackernews articles in emacs
-#+BEGIN_SRC emacs-lisp
-  (autoload 'hackernews "hackernews" nil t)
-  (setq hackernews-items-per-page 50)
-#+END_SRC
-
-Set a global keybinding to open hackernews
-#+begin_src emacs-lisp
-(global-set-key (kbd "C-x y") 'hackernews)
-#+end_src
-
-Grab a hackernews link and title, append it to a file for saved posts. I'd
-eventually want this to integrate with org-roam in some way, but this is fine
-for now.
-#+begin_src emacs-lisp
-  (defun hackernews-save-link (url)
-      (interactive (list (shr-url-at-point current-prefix-arg)))
-    (if (not url)
-	(message "No URL under point")
-      (setq url (url-encode-url url))
-      (setq title (thing-at-point 'line))
-      (write-region (format "[[%s][%s]]" url title) nil "~/Org-Files/Misc/Hackernews-Saved.org" 'append)))
-
-  (add-hook 'hackernews-mode-hook
-	    (lambda () (local-set-key (kbd "C-c C-s") #'hackernews-save-link)))
-#+end_src
-* Alerts
-=alert-toast= is a great library for windows notifications.
-I've got a few projects planned that involve notifications,
-so it's nice to have this around.
-
-#+BEGIN_SRC emacs-lisp
-  (require 'alert-toast)
-#+END_SRC
 * Avy
 This package makes it a lot easier to jump around a file.
 It's a lot easier to use than the default 'M-g g'
 #+begin_src emacs-lisp
-(require 'ivy-avy)
-(global-set-key (kbd "C-'") 'avy-goto-line)
-(global-set-key (kbd "C-:") 'avy-goto-char-2)
+  (require 'ivy-avy)
+  (global-set-key (kbd "C-'") 'avy-goto-line)
+  (global-set-key (kbd "C-:") 'avy-goto-char-2)
 #+end_src
-* Vundo
+
+* Wakatime
 #+begin_src emacs-lisp
-(require 'vundo)
-(global-set-key (kbd "M-/") 'vundo)
-(setq vundo-glyph-alist vundo-unicode-symbols)
+(require 'wakatime-mode)
+(global-wakatime-mode)
+
 #+end_src
